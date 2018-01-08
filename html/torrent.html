@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Torrent work</title>
+<style>
+body {
+  background-color: black;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: right top;
+  color: white;
+  font-family: monospace;
+  font-size: 22px;
+}
+.df {
+  border: 2px #2b2b2b solid;
+  background-color: #555555;
+} 
+.detail {
+  font-size: x-small;
+}
+.cmd {
+  border-color: snow;
+  border-width: 5px;
+  border-style: solid;
+  width: 1024px;
+}
+.view {
+  border-style: dashed;
+  border-width: 1px 0 0 0;
+  border-color: white;
+  overflow: auto;
+  color: #003300;
+  font-family: monospace;
+  width: 1024px;
+  height: 24ex;
+  white-space: noWrap;
+}
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-darkness/jquery-ui.css"/>
+<link rel="stylesheet" href="tabulator_midnight.min.css"/>
+<script type="text/javascript" src="tabulator.min.js"></script>
+<script>
+$(function(){
+    $("#lsview").tabulator({
+      columns:[
+        {title:"File Size", field:"lsize", sortable:false},
+        {title:"On Disk Size", field:"rsize", sortable:false},
+        {title:"Full Path", field:"fpath", sortable:true},
+      ],
+      rowDblClick:function(e, row){
+         lsview();
+      },
+    });
+    $("#psview").tabulator({
+      columns:[
+        {title:"Process Id", field:"pid", sorter:"number"},
+        {title:"Torrent File Name", field:"title"},
+      ],
+      rowDblClick:function(e, row){
+         var rowdata = row.getData();
+         psview(rowdata.pid);
+      },
+    });
+    dfview();
+    lsview();
+    psview();
+});
+function dfview(){
+    $.ajax({
+        url: "/cgi-bin/dfview.php", cache: false
+    }).done(function( data ){ $("#dfview").html(data); });
+    setTimeout("dfview()", 10000);
+}
+function lsview(){
+    $.ajax({
+        url: "/cgi-bin/lsview.php", cache: false, dataType: 'jsonp', jsonpCallback: 'getFileList'
+    }).done(function( data ){ $("#lsview").tabulator("setData", data); });
+}
+function psview(pid){
+    $.ajax({
+        url: "/cgi-bin/psview.php", data: {pid: pid}, cache: false, dataType: 'jsonp', jsonpCallback: 'getProcessList'
+    }).done(function( data ){ $("#psview").tabulator("setData", data); }).always(function( arg1, status, arg2){ console.log(status);});
+}
+function dotorrent(){
+    var fd = new FormData($("#torrentform").get(0));
+    $.ajax({
+        url: "/cgi-bin/trmgr.php",
+        type: "POST",
+        data: fd,
+        processData: false,
+        contentType: false
+    }).done(function( data ){
+        $("#res").html(data);
+        lsview();
+        psview();
+    });
+}
+</script>
+</head>
+<body>
+<div>
+  <form id="torrentform">
+  <input type="file" name="torrentfile" onChange="dotorrent()"></input>
+  </form>
+</div>
+<hr/>
+<div>
+  <div id="dfview"></div>
+  <div id="res"></div>
+</div>
+<hr/>
+<div id="lsview"></div>
+<hr/>
+<div id="psview"></div>
+</body>
+</html>
+

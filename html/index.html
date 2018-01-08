@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>何に叛くとしても</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/humanity/jquery-ui.css">
+<style>
+body {
+background-color: black;
+background-image: url("bg_1.jpg");
+background-attachment: fixed;
+background-position: right top;
+color: lime;
+font-family: monospace;
+font-size: 14px;
+}
+#resizable { width: 320px; height: 260px; padding: 0.5em; }
+#resizable h3 { text-align: center; margin: 0; }
+</style>
+<script>
+$(function() {
+$( "#resizable" ).resizable();
+});
+</script>
+</head>
+<body>
+<div id="resizable" class="ui-widget-content">
+  <h3 class="ui-widget-header">Resizable</h3>
+  <p>hello world.</p>
+</div>
+</body>
+</html>
+
